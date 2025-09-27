@@ -1,0 +1,677 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>DocDefendes Unified AI Demo (Approved & Rejected Scenarios)</title>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;600;700;800;900&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    
+    <script src="https://unpkg.com/react@18/umd/react.development.js"></script>
+    <script src="https://unpkg.com/react-dom@18/umd/react-dom.development.js"></script>
+    <script src="https://unpkg.com/@babel/standalone/babel.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
+
+    <style>
+        /* =================================================================
+           1. CORE STYLING
+           ================================================================= */
+        :root {
+            --primary: #1e3a5f;
+            --secondary: #ffc107;
+            --light-bg: #f5f7fa;
+            --white: #ffffff;
+            --success: #28a745;
+            --danger: #c82333;
+            --font-main: 'Inter', sans-serif;
+            --border-radius: 10px;
+        }
+
+        body {
+            font-family: var(--font-main);
+            background: var(--light-bg);
+            padding: 20px;
+            color: #333;
+        }
+
+        .container {
+            width: 100%;
+            max-width: 1200px; /* Wider container for side-panels */
+            background: var(--white);
+            border-radius: 15px;
+            box-shadow: 0 10px 30px rgba(0,0,0,0.1);
+            padding: 40px;
+            margin: auto;
+        }
+
+        h1 {
+            color: var(--primary);
+            font-size: 2.2rem;
+            font-weight: 900;
+            border-bottom: 4px solid var(--secondary);
+            padding-bottom: 15px;
+            margin-bottom: 30px;
+            display: flex;
+            align-items: center;
+        }
+        
+        /* Demo Mode Selection */
+        .mode-selector {
+            display: flex;
+            gap: 20px;
+            margin-bottom: 30px;
+        }
+        .mode-btn {
+            padding: 15px 30px;
+            border-radius: 8px;
+            font-weight: 700;
+            cursor: pointer;
+            transition: all 0.3s;
+            border: 2px solid transparent;
+            flex: 1;
+            text-align: center;
+        }
+        .mode-btn-approved {
+            background: #e8f5e9;
+            color: var(--success);
+            border-color: var(--success);
+        }
+        .mode-btn-approved.selected {
+            background: var(--success);
+            color: var(--white);
+        }
+        .mode-btn-rejected {
+            background: #fde8ea;
+            color: var(--danger);
+            border-color: var(--danger);
+        }
+        .mode-btn-rejected.selected {
+            background: var(--danger);
+            color: var(--white);
+        }
+
+        /* Main Grid Layout */
+        .main-content-grid {
+            display: grid;
+            grid-template-columns: 2fr 1fr; /* 2/3 for main process, 1/3 for side panels */
+            gap: 30px;
+        }
+        
+        /* Side Panel Styles */
+        .side-panel {
+            background: #f8f8f8;
+            border-radius: var(--border-radius);
+            padding: 20px;
+            border: 1px solid #ddd;
+            height: 100%;
+            overflow-y: auto;
+        }
+        .side-panel h3 {
+            color: var(--primary);
+            font-size: 1.2rem;
+            margin-bottom: 15px;
+            border-bottom: 2px solid #eee;
+            padding-bottom: 8px;
+        }
+        .extracted-text-area {
+            font-family: monospace;
+            white-space: pre-wrap;
+            background: #fff;
+            padding: 10px;
+            border: 1px solid #ccc;
+            min-height: 150px;
+            max-height: 250px;
+            overflow-y: auto;
+            font-size: 0.9rem;
+        }
+        .metadata-item {
+            display: flex;
+            justify-content: space-between;
+            padding: 5px 0;
+            border-bottom: 1px dashed #eee;
+            font-size: 0.9rem;
+        }
+        .metadata-item strong { color: var(--primary); }
+        .metadata-item span { font-weight: 500; }
+
+        /* Forgery Visualization Area (Fake Scenario) */
+        .visualization-area {
+            margin-top: 20px;
+            border: 1px solid #ccc;
+            padding: 15px;
+            background: var(--white);
+            border-radius: 8px;
+            text-align: center;
+            min-height: 200px;
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+            align-items: center;
+        }
+        .visualization-area.active {
+            border-color: var(--danger);
+            background: #fffafa;
+            box-shadow: 0 0 15px rgba(200, 35, 51, 0.4);
+        }
+        .viz-header { 
+            font-weight: 700; 
+            margin-bottom: 10px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 10px;
+        }
+
+        /* ELA Image Simulation */
+        .ela-image {
+            width: 90%;
+            height: 100px;
+            background: repeating-linear-gradient(
+                45deg,
+                #f00,
+                #f00 5px,
+                #000 5px,
+                #000 10px
+            );
+            border: 3px solid var(--danger);
+            animation: ela-pulse 0.5s infinite alternate;
+        }
+        @keyframes ela-pulse {
+            from { opacity: 0.8; }
+            to { opacity: 1; }
+        }
+
+        /* Heatmap Simulation */
+        .heatmap-image {
+            width: 150px;
+            height: 150px;
+            border-radius: 50%;
+            background: radial-gradient(circle at 50% 50%, 
+                        rgba(255, 0, 0, 0.9) 0%, 
+                        rgba(255, 165, 0, 0.6) 30%, 
+                        rgba(255, 255, 0, 0.3) 60%, 
+                        transparent 100%);
+            animation: heatmap-fade 2s infinite alternate;
+            box-shadow: 0 0 10px red;
+        }
+        @keyframes heatmap-fade {
+            from { transform: scale(0.95); }
+            to { transform: scale(1.05); }
+        }
+
+        /* Result Panel (Updated from previous version) */
+        .result-panel {
+            padding: 30px;
+            border-radius: 15px;
+            margin-top: 30px;
+            text-align: center;
+            font-weight: 700;
+        }
+        .result-panel.approved {
+            background: #e8f5e9;
+            border: 3px solid var(--success);
+            color: var(--success);
+            box-shadow: 0 0 20px rgba(40, 167, 69, 0.3);
+        }
+        .result-panel.rejected {
+            background: #fff3f4;
+            border: 3px solid var(--danger);
+            color: var(--danger);
+            box-shadow: 0 0 20px rgba(200, 35, 51, 0.4);
+            position: relative;
+        }
+        .result-panel h2 {
+            font-size: 2.5rem;
+            margin-bottom: 10px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 15px;
+        }
+        .digital-stamp { 
+            font-size: 1.2rem; 
+            font-weight: 500; 
+            color: var(--primary); 
+            margin-top: 15px;
+        }
+        .cancellation-strike {
+            position: absolute;
+            top: 50%;
+            left: 0;
+            width: 100%;
+            height: 10px;
+            background: var(--danger);
+            transform: translateY(-50%) rotate(-3deg);
+            z-index: 5;
+            box-shadow: 0 0 20px var(--danger);
+            opacity: 0.7;
+        }
+    </style>
+</head>
+<body>
+    <div id="scan-root"></div>
+
+    <script type="text/babel">
+        const { useState } = React;
+
+        // --- GLOBAL DATA MOCKUPS ---
+        const MOCK_DATA = {
+            // Data for the APPROVED (Real) Scenario
+            APPROVED: {
+                extractedText: "GOVERNMENT OF MAHARASHTRA\nSPPU MARK SHEET - MAY 2025\nName: RAHUL N. JADHAV\nRoll No: 2023CSE001\nGrade: A+\nVerification Code: XYZ9876",
+                verificationScore: 96.5,
+                forgeryLabel: "APPROVED (Authentic)",
+                metadata: {
+                    source: "SPPU Scanning System v1.2",
+                    creationDate: "2025-06-10 10:30:00",
+                    modDate: "2025-06-10 10:30:00",
+                    compression: "JPEG 95%",
+                }
+            },
+            // Data for the REJECTED (Fake) Scenario
+            REJECTED: {
+                extractedText: "GOVERNMENT OF MAHARASHTRA\nSPPU MARK SHEET - JUNE 2025\nName: RAHUL N. JADAV (!!!)\nRoll No: 2023CSE001\nGrade: A+++++\nVerification Code: XYZ9876",
+                verificationScore: 89.2,
+                forgeryLabel: "REJECTED (Forgery Detected)",
+                metadata: {
+                    source: "Adobe Photoshop CS6 / Unknown App", // Inconsistent source
+                    creationDate: "2025-06-15 11:45:22",
+                    modDate: "2025-09-25 19:30:15", // Metadata mismatch
+                    compression: "JPEG 85% (Inconsistent)",
+                }
+            },
+            // Expected Text for Comparison
+            EXPECTED_TEXT: "GOVERNMENT OF MAHARASHTRA\nSPPU MARK SHEET - MAY 2025\nName: RAHUL N. JADHAV\nRoll No: 2023CSE001\nGrade: A+\nVerification Code: XYZ9876",
+        };
+
+
+        function DocDefendesUnifiedDemo() {
+            const [demoMode, setDemoMode] = useState('APPROVED'); // 'APPROVED' or 'REJECTED'
+            const [isLoading, setIsLoading] = useState(false);
+            const [scanResults, setScanResults] = useState(null);
+            const [currentStep, setCurrentStep] = useState(0); // For animating the rejection explanation
+            const [progress, setProgress] = useState(0);
+            const [aiStep, setAiStep] = useState('Awaiting Scan...');
+
+            const isRejected = demoMode === 'REJECTED';
+            const data = isRejected ? MOCK_DATA.REJECTED : MOCK_DATA.APPROVED;
+
+            // --- REJECTION EXPLANATION STEPS ---
+            const REJECTION_STEPS = [
+                { title: "OCR Mismatch: Text Anomalies", icon: "fas fa-text-width", viz: "ocr" },
+                { title: "Visual Forgery Localization (Heatmap)", icon: "fas fa-fire-alt", viz: "heatmap" },
+                { title: "ELA: Compression Artifacts Analysis", icon: "fas fa-palette", viz: "ela" },
+                { title: "Metadata Inconsistency", icon: "fas fa-clock", viz: "metadata" },
+                { title: "Font/Format Inconsistency", icon: "fas fa-font", viz: "font" },
+                { title: "SUMMARY: Document Permanently Nullified", icon: "fas fa-ban", viz: "final" },
+            ];
+            
+            // --- SIMULATION LOGIC ---
+            const simulateScan = () => {
+                return new Promise(resolve => {
+                    const delay = isRejected ? 7500 : 5000;
+                    const steps = isRejected ? [
+                        { p: 10, text: "<i class='fas fa-lock'></i> Initializing SecureVault AI Engine V3.0 (Security Protocol ALPHA)..." },
+                        { p: 25, text: "<i class='fas fa-receipt'></i> Step 1/7: OCR & Deep Text Feature Extraction" },
+                        { p: 40, text: "<i class='fas fa-microchip'></i> Step 2/7: CNN Texture & Font Anomaly Analysis" },
+                        { p: 55, text: "<i class='fas fa-globe'></i> Step 3/7: Global Document Forgery Repository Cross-Check" },
+                        { p: 70, text: "<i class='fas fa-fingerprint'></i> Step 4/7: Blockchain Signature Check... (Status: MISMATCH)" },
+                        { p: 90, text: "<i class='fas fa-database'></i> Step 5/7: Final Biometric Source Validation... [CRITICAL SYSTEM FAILURE: AUTH_001]" },
+                        { p: 100, text: "Verification Complete - FORGERY." }
+                    ] : [
+                        { p: 10, text: "<i class='fas fa-lock'></i> Initializing SecureVault AI Engine V3.0 (Standard Protocol)..." },
+                        { p: 40, text: "<i class='fas fa-receipt'></i> Step 1/3: OCR & Deep Feature Extraction" },
+                        { p: 70, text: "<i class='fas fa-fingerprint'></i> Step 2/3: Blockchain Signature Check... (Status: MATCHED)" },
+                        { p: 90, text: "<i class='fas fa-database'></i> Step 3/3: Final Source Validation... (Status: OK)" },
+                        { p: 100, text: "Verification Complete - AUTHENTICATED." }
+                    ];
+                    let stepIndex = 0;
+                    
+                    const interval = setInterval(() => {
+                        setProgress(p => {
+                            // Advance AI Step text based on progress
+                            if (p >= steps[stepIndex]?.p) {
+                                setAiStep(steps[stepIndex]?.text || 'Finalizing...');
+                                if (stepIndex < steps.length - 1) stepIndex++;
+                            }
+
+                            const increment = (100 / delay) * 200; 
+                            let newP = p + increment;
+                            
+                            if (newP >= 100) {
+                                clearInterval(interval);
+                                setAiStep(steps[steps.length - 1].text);
+                                return 100; 
+                            }
+                            return newP;
+                        });
+                    }, 200);
+
+                    setTimeout(() => {
+                        resolve(data); // Resolve with the appropriate mock data
+                    }, delay);
+                });
+            };
+
+            const handleInitiateScan = async () => {
+                setScanResults(null);
+                setCurrentStep(0);
+                setIsLoading(true);
+                setProgress(0);
+                setAiStep('Awaiting Scan...');
+
+                // SCENE: Uploading document...
+                if (isRejected) {
+                     console.log(`[SCRIPT] Now uploading the suspicious document. OCR and deep models analyze both image and text features.`);
+                } else {
+                    console.log(`[SCRIPT] Uploading the genuine document. System runs OCR to extract text and runs forgery detectors.`);
+                }
+                
+                const result = await simulateScan();
+                setScanResults(result);
+                setIsLoading(false);
+                setProgress(100);
+
+                // SCENE: Result appears...
+                if (isRejected) {
+                    console.log(`[SCRIPT] Result: Forgery detected. Confidence ${result.verificationScore}% — see highlighted regions and ELA mismatch.`);
+                } else {
+                    console.log(`[SCRIPT] Result: Authentic. Confidence ${result.verificationScore}%. Digital stamp issued.`);
+                }
+            };
+
+            const handleStartExplanation = () => {
+                setCurrentStep(1); // Start the rejection explanation
+                console.log(`[SCRIPT] (E) Explaining how the system caught the forgery...`);
+            };
+
+            const handleNextStep = () => {
+                if (currentStep < REJECTION_STEPS.length) {
+                    const stepTitle = REJECTION_STEPS[currentStep - 1].title;
+                    // Speak the script for the current step
+                    if (stepTitle.includes("OCR mismatch")) {
+                        console.log(`[SCRIPT] OCR detects changed text — extra characters and odd spacing that don’t match original template.`);
+                    } else if (stepTitle.includes("Visual forgery localization")) {
+                        console.log(`[SCRIPT] The model’s heatmap pinpoints the edited region (signature/marksheet photo).`);
+                    } else if (stepTitle.includes("ELA")) {
+                        console.log(`[SCRIPT] ELA highlights differing compression levels — clear sign of local edits.`);
+                    } else if (stepTitle.includes("Metadata")) {
+                        console.log(`[SCRIPT] File metadata shows inconsistent timestamps and an unknown source app.`);
+                    } else if (stepTitle.includes("Font/format inconsistency")) {
+                        console.log(`[SCRIPT] Fonts and spacing don’t match the original template — another red flag.`);
+                    } else if (stepTitle.includes("SUMMARY")) {
+                        console.log(`[SCRIPT] Together, OCR anomalies, localized visual artifacts, ELA, and metadata inconsistencies prove this document was tampered with.`);
+                        // (F) Show action & reporting
+                        setTimeout(() => {
+                            console.log(`[SCRIPT] The system flags the document as REJECTED, logs evidence, and notifies the institute for manual review.`);
+                        }, 500);
+                    }
+                    setCurrentStep(prev => prev + 1);
+                }
+            };
+            
+            // --- UI Components ---
+            
+            const ScanningAnimation = () => {
+                const isGlitching = isLoading && isRejected && progress > 90;
+                const scannerLineStyle = { 
+                    animation: isGlitching ? 'scan-reject 0.5s infinite alternate' : 'scan 2.5s infinite alternate',
+                    backgroundColor: isGlitching ? 'var(--danger)' : 'var(--success)',
+                    boxShadow: isGlitching ? '0 0 15px rgba(255, 0, 0, 0.8)' : '0 0 15px rgba(40, 167, 69, 0.8)'
+                };
+
+                return (
+                    <div className={`scanner-view ${isGlitching ? 'glitch' : ''}`} 
+                         style={{ boxShadow: isRejected ? '0 0 40px rgba(200, 35, 51, 0.8)' : '0 0 40px rgba(40, 167, 69, 0.4)' }}
+                    >
+                        <i className={`fas ${isRejected ? 'fa-biohazard' : 'fa-shield-alt'}`} style={{fontSize: '2rem', color: isRejected ? 'var(--danger)' : 'var(--success)'}}></i>
+                        <p style={{fontWeight: 700}}>DocDefendes **AI DEEP SCAN** in Progress...</p>
+                        <div className="scanner-animation" style={{borderColor: isRejected ? 'var(--danger)' : 'var(--primary)'}}>
+                            <div className="scanner-line" style={scannerLineStyle}></div>
+                        </div>
+                        <p className="ai-step-text" dangerouslySetInnerHTML={{__html: aiStep}}></p>
+                        <p style={{fontSize: '0.9rem', color: isRejected ? '#ff8888' : 'var(--secondary)'}}>Verification Progress: {Math.round(progress)}%</p>
+                    </div>
+                );
+            };
+
+            const ForgeryVisualization = () => {
+                const step = REJECTION_STEPS[currentStep - 1];
+                if (!isRejected || !step || currentStep <= 0 || currentStep > REJECTION_STEPS.length) return (
+                    <div className="visualization-area">
+                        <i className="fas fa-eye-slash" style={{fontSize: '3rem', color: '#ccc'}}></i>
+                        <p style={{color: '#888'}}>Waiting for Forgery Evidence...</p>
+                    </div>
+                );
+
+                const currentViz = step.viz;
+
+                const renderVisualization = () => {
+                    switch (currentViz) {
+                        case 'ocr':
+                            return (
+                                <div>
+                                    <p style={{color: 'var(--danger)', fontWeight: 700}}>OCR Mismatch Detected!</p>
+                                    <div style={{textAlign: 'left', margin: '10px', fontSize: '0.8rem'}}>
+                                        <p style={{fontWeight: 700}}>Expected Text:</p>
+                                        <div style={{fontFamily: 'monospace', color: 'var(--success)', whiteSpace: 'pre-wrap', maxHeight: '80px', overflow: 'hidden'}}>{MOCK_DATA.EXPECTED_TEXT.substring(0, 100)}...</div>
+                                        <p style={{fontWeight: 700, marginTop: '5px'}}>Extracted Text (Anomaly):</p>
+                                        <div style={{fontFamily: 'monospace', color: 'var(--danger)', whiteSpace: 'pre-wrap', maxHeight: '80px', overflow: 'hidden'}}>{MOCK_DATA.REJECTED.extractedText.substring(0, 100)}...</div>
+                                    </div>
+                                </div>
+                            );
+                        case 'heatmap':
+                            return (
+                                <>
+                                    <p style={{color: 'var(--danger)', fontWeight: 700}}>Visual Forgery Localization</p>
+                                    <div className="heatmap-image" title="Tampering in Signature/Marks Area"></div>
+                                    <p style={{fontSize: '0.8rem', color: '#555', marginTop: '10px'}}>Model confidence of tampering: **92.1%**</p>
+                                </>
+                            );
+                        case 'ela':
+                            return (
+                                <>
+                                    <p style={{color: 'var(--danger)', fontWeight: 700}}>Error Level Analysis (ELA) Mismatch</p>
+                                    <div className="ela-image" title="Inconsistent Compression/Editing Artifacts"></div>
+                                    <p style={{fontSize: '0.8rem', color: '#555', marginTop: '10px'}}>Sharp contrast implies local editing/pasting.</p>
+                                </>
+                            );
+                        case 'metadata':
+                            return (
+                                <>
+                                    <p style={{color: 'var(--danger)', fontWeight: 700}}>Metadata Anomaly</p>
+                                    <div style={{textAlign: 'left', margin: '10px auto', width: '90%', fontSize: '0.8rem'}}>
+                                        <div className="metadata-item"><strong>Creation Date:</strong> <span>{MOCK_DATA.REJECTED.metadata.creationDate}</span></div>
+                                        <div className="metadata-item" style={{color: 'var(--danger)'}}><strong>Modification Date:</strong> <span>{MOCK_DATA.REJECTED.metadata.modDate}</span></div>
+                                        <div className="metadata-item" style={{color: 'var(--danger)'}}><strong>Source App:</strong> <span>{MOCK_DATA.REJECTED.metadata.source}</span></div>
+                                    </div>
+                                </>
+                            );
+                        case 'font':
+                            return (
+                                <>
+                                    <p style={{color: 'var(--danger)', fontWeight: 700}}>Font/Format Inconsistency</p>
+                                    <i className="fas fa-highlighter" style={{fontSize: '4rem', color: '#faa', animation: 'pulse 1s infinite alternate'}}></i>
+                                    <p style={{fontSize: '0.9rem', color: '#555', marginTop: '10px'}}>System detected two different font libraries being used.</p>
+                                </>
+                            );
+                        case 'final':
+                            return (
+                                <div style={{padding: '20px', backgroundColor: 'var(--danger)', color: 'white', borderRadius: '8px'}}>
+                                    <i className="fas fa-skull-crossbones" style={{fontSize: '3rem'}}></i>
+                                    <p style={{fontSize: '1.5rem', fontWeight: 900}}>CANCELLATION PROTOCOL INITIATED</p>
+                                    <p style={{fontSize: '0.9rem', fontWeight: 500}}>Evidence is now logged on Blockchain. Institute is notified.</p>
+                                </div>
+                            );
+                        default:
+                            return null;
+                    }
+                };
+                
+                return (
+                    <div className={`visualization-area active`}>
+                        <h4 className="viz-header" style={{color: 'var(--danger)'}}><i className={step.icon}></i> {step.title}</h4>
+                        {renderVisualization()}
+                    </div>
+                );
+            };
+
+            const RejectionExplanation = () => {
+                if (!isRejected || !scanResults || currentStep === 0) return null;
+
+                // SCENE: Show side-by-side comparisons...
+                return (
+                    <div style={{marginTop: '30px', padding: '20px', border: '1px solid #ffccaa', borderRadius: '10px', backgroundColor: '#fff8f0'}}>
+                        <h3 style={{color: '#d67e00', borderBottom: '2px solid #ffccaa'}}><i className="fas fa-exclamation-circle"></i> FORGERY EVIDENCE BREAKDOWN (Step {currentStep} of {REJECTION_STEPS.length})</h3>
+                        <p style={{color: '#333', fontWeight: 600, marginBottom: '20px'}}>
+                            {currentStep <= REJECTION_STEPS.length ? 
+                                `Click 'NEXT EVIDENCE' to walk through the system's multi-layered detection process.` : 
+                                `(F) ACTION & REPORTING: The system logs and notifies.`}
+                        </p>
+                        
+                        {currentStep <= REJECTION_STEPS.length && <ForgeryVisualization />}
+
+                        <button 
+                            className="btn" 
+                            onClick={handleNextStep} 
+                            disabled={currentStep > REJECTION_STEPS.length}
+                            style={{backgroundColor: '#d67e00', width: '100%'}}
+                        >
+                            <i className="fas fa-arrow-right"></i> 
+                            {currentStep < REJECTION_STEPS.length ? `NEXT EVIDENCE: ${REJECTION_STEPS[currentStep].title}` : 'FINISH DEMO & SHOW REPORTING'}
+                        </button>
+
+                        {currentStep > REJECTION_STEPS.length && (
+                            <div style={{marginTop: '20px', padding: '15px', backgroundColor: '#f0f0f0', borderRadius: '8px', border: '1px solid #ccc'}}>
+                                <p style={{fontWeight: 700}}>Reporting/Action Simulation:</p>
+                                <p><i className="fas fa-check-double" style={{color: 'var(--success)'}}></i> Evidence Logged to Immutable Ledger.</p>
+                                <p><i className="fas fa-bell" style={{color: 'var(--danger)'}}></i> Admin/Institute Notified: **PENDING MANUAL REVIEW**.</p>
+                                <p><i className="fas fa-user-slash" style={{color: 'var(--danger)'}}></i> Applicant Blocked from Submission Portal.</p>
+                            </div>
+                        )}
+                    </div>
+                );
+            };
+
+            // --- Main Render ---
+            return (
+                <div className="container">
+                    <h1><i className="fas fa-shield-alt"></i> DocDefendes: Unified AI Verification Demo</h1>
+                    
+                    <div className="mode-selector">
+                        <button 
+                            className={`mode-btn mode-btn-approved ${demoMode === 'APPROVED' ? 'selected' : ''}`} 
+                            onClick={() => { setDemoMode('APPROVED'); setScanResults(null); setCurrentStep(0); }}
+                        >
+                            <i className="fas fa-check-circle"></i> SCENARIO 1: **GENUINE** DOCUMENT (APPROVED)
+                        </button>
+                        <button 
+                            className={`mode-btn mode-btn-rejected ${demoMode === 'REJECTED' ? 'selected' : ''}`} 
+                            onClick={() => { setDemoMode('REJECTED'); setScanResults(null); setCurrentStep(0); }}
+                        >
+                            <i className="fas fa-times-circle"></i> SCENARIO 2: **FORGERY** DOCUMENT (REJECTED)
+                        </button>
+                    </div>
+
+                    <div className="main-content-grid">
+                        
+                        {/* LEFT SIDE: SCAN & RESULT */}
+                        <div>
+                            <p style={{marginBottom: '15px', fontWeight: 600}}>
+                                Document: 
+                                <span style={{color: isRejected ? 'var(--danger)' : 'var(--success)', marginLeft: '10px'}}>
+                                    {isRejected ? 'FAKE_MARK_SHEET.pdf' : 'GENUINE_MARK_SHEET.pdf'}
+                                </span>
+                            </p>
+
+                            <button 
+                                className="btn" 
+                                onClick={handleInitiateScan} 
+                                disabled={isLoading}
+                                style={{backgroundColor: isRejected ? 'var(--danger)' : 'var(--primary)', width: '100%'}}
+                            >
+                                {isLoading ? (
+                                    <>
+                                        <div className="spinner" role="status"></div>
+                                        {isRejected ? 'AI SCANNING FOR FORGERY (7.5s)' : 'AI VALIDATING (5s)'}
+                                    </>
+                                ) : (
+                                    <>
+                                        <i className="fas fa-search-plus"></i>
+                                        {scanResults ? 'RE-RUN SCAN' : 'START DEMO SCAN'}
+                                    </>
+                                )}
+                            </button>
+
+                            {isLoading && <ScanningAnimation />}
+
+                            {scanResults && (
+                                <div className={`result-panel ${isRejected ? 'rejected' : 'approved'}`}>
+                                    <h2>
+                                        <i className={`fas ${isRejected ? 'fa-ban' : 'fa-check-circle'}`}></i>
+                                        {isRejected ? 'REJECTED' : 'APPROVED'}
+                                    </h2>
+                                    <p style={{fontSize: '1.2rem', fontWeight: 500}}>
+                                        {scanResults.forgeryLabel} | Confidence: **{scanResults.verificationScore}%**
+                                    </p>
+                                    
+                                    {!isRejected && (
+                                        <div className="digital-stamp">
+                                            <i className="fas fa-stamp"></i> Digital Stamp Issued: **SV-MH-2025-A-1024**
+                                        </div>
+                                    )}
+
+                                    {/* Action button for Rejected Scenario */}
+                                    {isRejected && currentStep === 0 && (
+                                        <button 
+                                            className="btn" 
+                                            onClick={handleStartExplanation} 
+                                            style={{backgroundColor: '#d67e00', marginTop: '20px'}}
+                                        >
+                                            <i className="fas fa-eye"></i> SHOW FORGERY EVIDENCE BREAKDOWN
+                                        </button>
+                                    )}
+                                    {isRejected && currentStep > 0 && <div className="cancellation-strike"></div>}
+                                </div>
+                            )}
+
+                            {/* Rejection Explanation Phase */}
+                            {isRejected && scanResults && currentStep > 0 && <RejectionExplanation />}
+                            
+                        </div>
+
+                        {/* RIGHT SIDE: TOOL PANELS */}
+                        <div className="side-panel">
+                            <h3><i className="fas fa-clipboard-list"></i> OCR Text Extraction Pane</h3>
+                            <div className="extracted-text-area">
+                                {scanResults ? scanResults.extractedText : "Extracted text will appear here after scanning..."}
+                            </div>
+                            
+                            <h3 style={{marginTop: '30px'}}><i className="fas fa-cogs"></i> Metadata / EXIF Viewer</h3>
+                            <div style={{minHeight: '150px'}}>
+                                {scanResults ? (
+                                    Object.entries(scanResults.metadata).map(([key, value]) => (
+                                        <div 
+                                            key={key} 
+                                            className="metadata-item"
+                                            style={{color: (isRejected && (key === 'modDate' || key === 'source')) ? 'var(--danger)' : '#333'}}
+                                        >
+                                            <strong>{key.charAt(0).toUpperCase() + key.slice(1).replace(/([A-Z])/g, ' $1')}:</strong> 
+                                            <span>{value}</span>
+                                        </div>
+                                    ))
+                                ) : (
+                                    <p style={{fontSize: '0.8rem', color: '#888'}}>Metadata details will be displayed here.</p>
+                                )}
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            );
+        }
+
+        const root = ReactDOM.createRoot(document.getElementById('scan-root'));
+        root.render(<DocDefendesUnifiedDemo />);
+    </script>
+</body>
+</html>
