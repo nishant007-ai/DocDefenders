@@ -1,5 +1,7 @@
 # 🛡️ DocDefenders – Every Document Tells the Truth
 
+🎬 **Watch the Live Demo:** [![DocDefenders Demo](https://img.youtube.com/vi/A5fZphfZ4cE/0.jpg)](https://youtu.be/A5fZphfZ4cE)
+
 ![DocDefenders Banner](https://imgur.com/your-image.png)  
 
 🚀 **DocDefenders** is an **AI-powered document authentication system** designed to **detect forgery, tampering, and ensure authenticity** across multiple sectors. With DocDefenders, **every document tells the truth**.
