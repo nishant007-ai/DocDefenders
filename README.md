@@ -159,3 +159,8 @@ Push to the branch: git push origin feature/YourFeature
 Open a Pull Request
 
 We welcome collaboration, feedback, and bug reports!
+
+
+# Nishant Jadhav
+
+![GitHub Shark](https://github-readme-stats.vercel.app/api?username=nishant007-ai&show_icons=true&theme=radical&count_private=true)
