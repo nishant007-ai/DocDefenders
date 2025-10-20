@@ -164,3 +164,33 @@ We welcome collaboration, feedback, and bug reports!
 # Nishant Jadhav
 
 ![GitHub Shark](https://github-readme-stats.vercel.app/api?username=nishant007-ai&show_icons=true&theme=radical&count_private=true)
+# Nishant Jadhav
+
+👋 Hi, I’m Nishant!  
+I’m a developer passionate about AI, web development, and solving real-world problems.  
+
+---
+
+## 📊 GitHub Stats
+
+![GitHub Shark](https://github-readme-stats.vercel.app/api?username=nishant007-ai&show_icons=true&theme=radical&count_private=true)
+![GitHub Followers](https://img.shields.io/github/followers/nishant007-ai?style=social)
+![GitHub Stars](https://img.shields.io/github/stars/nishant007-ai?style=social)
+![Last Commit](https://img.shields.io/github/last-commit/nishant007-ai/bounty-bug-hunture)
+
+---
+
+## 🚀 Projects
+
+Here are some of my notable projects:
+
+- [Bounty Bug Hunture](https://github.com/nishant007-ai/bounty-bug-hunture) - Streamlit Bug Bounty Assistant  
+- [DocDefenders](https://github.com/nishant007-ai/DocDefenders) - Document Security and Tracking  
+
+---
+
+## 📫 Contact Me
+
+- Email: nnjadhav2004@gmail.com  
+- GitHub: [https://github.com/nishant007-ai](https://github.com/nishant007-ai)  
+
