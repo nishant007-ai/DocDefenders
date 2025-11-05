@@ -589,16 +589,4 @@
                                 onClick={handleInitiateScan} 
                                 disabled={isLoading}
                                 style={{backgroundColor: isRejected ? 'var(--danger)' : 'var(--primary)', width: '100%'}}
-                            >
-                                {isLoading ? (
-                                    <>
-                                        <div className="spinner" role="status"></div>
-                                        {isRejected ? 'AI SCANNING FOR FORGERY (7.5s)' : 'AI VALIDATING (5s)'}
-                                    </>
-                                ) : (
-                                    <>
-                                        <i className="fas fa-search-plus"></i>
-                                        {scanResults ? 'RE-RUN SCAN' : 'START DEMO SCAN'}
-                                    </>
-                                )}
- 
+                       
