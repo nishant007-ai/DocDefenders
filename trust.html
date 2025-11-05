@@ -503,18 +503,4 @@
                                     <p style={{fontSize: '0.9rem', fontWeight: 500}}>Evidence is now logged on Blockchain. Institute is notified.</p>
                                 </div>
                             );
-                        default:
-                            return null;
-                    }
-                };
-                
-                return (
-                    <div className={`visualization-area active`}>
-                        <h4 className="viz-header" style={{color: 'var(--danger)'}}><i className={step.icon}></i> {step.title}</h4>
-                        {renderVisualization()}
-                    </div>
-                );
-            };
-
-            const RejectionExplanation = () => {
-                if (!isRejected || !scanResults || currentStep === 0) return null;
+      
