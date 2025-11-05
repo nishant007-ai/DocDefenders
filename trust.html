@@ -624,38 +624,4 @@
                                     {/* Action button for Rejected Scenario */}
                                     {isRejected && currentStep === 0 && (
                                         <button 
-                                            className="btn" 
-                                            onClick={handleStartExplanation} 
-                                            style={{backgroundColor: '#d67e00', marginTop: '20px'}}
-                                        >
-                                            <i className="fas fa-eye"></i> SHOW FORGERY EVIDENCE BREAKDOWN
-                                        </button>
-                                    )}
-                                    {isRejected && currentStep > 0 && <div className="cancellation-strike"></div>}
-                                </div>
-                            )}
-
-                            {/* Rejection Explanation Phase */}
-                            {isRejected && scanResults && currentStep > 0 && <RejectionExplanation />}
-                            
-                        </div>
-
-                        {/* RIGHT SIDE: TOOL PANELS */}
-                        <div className="side-panel">
-                            <h3><i className="fas fa-clipboard-list"></i> OCR Text Extraction Pane</h3>
-                            <div className="extracted-text-area">
-                                {scanResults ? scanResults.extractedText : "Extracted text will appear here after scanning..."}
-                            </div>
-                            
-                            <h3 style={{marginTop: '30px'}}><i className="fas fa-cogs"></i> Metadata / EXIF Viewer</h3>
-                            <div style={{minHeight: '150px'}}>
-                                {scanResults ? (
-                                    Object.entries(scanResults.metadata).map(([key, value]) => (
-                                        <div 
-                                            key={key} 
-                                            className="metadata-item"
-                                            style={{color: (isRejected && (key === 'modDate' || key === 'source')) ? 'var(--danger)' : '#333'}}
-                                        >
-                                            <strong>{key.charAt(0).toUpperCase() + key.slice(1).replace(/([A-Z])/g, ' $1')}:</strong> 
-                                            <span>{value}</span>
-                              
+              
