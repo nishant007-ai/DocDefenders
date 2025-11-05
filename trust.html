@@ -567,26 +567,4 @@
                         </button>
                         <button 
                             className={`mode-btn mode-btn-rejected ${demoMode === 'REJECTED' ? 'selected' : ''}`} 
-                            onClick={() => { setDemoMode('REJECTED'); setScanResults(null); setCurrentStep(0); }}
-                        >
-                            <i className="fas fa-times-circle"></i> SCENARIO 2: **FORGERY** DOCUMENT (REJECTED)
-                        </button>
-                    </div>
-
-                    <div className="main-content-grid">
-                        
-                        {/* LEFT SIDE: SCAN & RESULT */}
-                        <div>
-                            <p style={{marginBottom: '15px', fontWeight: 600}}>
-                                Document: 
-                                <span style={{color: isRejected ? 'var(--danger)' : 'var(--success)', marginLeft: '10px'}}>
-                                    {isRejected ? 'FAKE_MARK_SHEET.pdf' : 'GENUINE_MARK_SHEET.pdf'}
-                                </span>
-                            </p>
-
-                            <button 
-                                className="btn" 
-                                onClick={handleInitiateScan} 
-                                disabled={isLoading}
-                                style={{backgroundColor: isRejected ? 'var(--danger)' : 'var(--primary)', width: '100%'}}
-                       
+     
