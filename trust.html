@@ -303,3 +303,204 @@
                 { title: "ELA: Compression Artifacts Analysis", icon: "fas fa-palette", viz: "ela" },
                 { title: "Metadata Inconsistency", icon: "fas fa-clock", viz: "metadata" },
                 { title: "Font/Format Inconsistency", icon: "fas fa-font", viz: "font" },
+                { title: "SUMMARY: Document Permanently Nullified", icon: "fas fa-ban", viz: "final" },
+            ];
+            
+            // --- SIMULATION LOGIC ---
+            const simulateScan = () => {
+                return new Promise(resolve => {
+                    const delay = isRejected ? 7500 : 5000;
+                    const steps = isRejected ? [
+                        { p: 10, text: "<i class='fas fa-lock'></i> Initializing SecureVault AI Engine V3.0 (Security Protocol ALPHA)..." },
+                        { p: 25, text: "<i class='fas fa-receipt'></i> Step 1/7: OCR & Deep Text Feature Extraction" },
+                        { p: 40, text: "<i class='fas fa-microchip'></i> Step 2/7: CNN Texture & Font Anomaly Analysis" },
+                        { p: 55, text: "<i class='fas fa-globe'></i> Step 3/7: Global Document Forgery Repository Cross-Check" },
+                        { p: 70, text: "<i class='fas fa-fingerprint'></i> Step 4/7: Blockchain Signature Check... (Status: MISMATCH)" },
+                        { p: 90, text: "<i class='fas fa-database'></i> Step 5/7: Final Biometric Source Validation... [CRITICAL SYSTEM FAILURE: AUTH_001]" },
+                        { p: 100, text: "Verification Complete - FORGERY." }
+                    ] : [
+                        { p: 10, text: "<i class='fas fa-lock'></i> Initializing SecureVault AI Engine V3.0 (Standard Protocol)..." },
+                        { p: 40, text: "<i class='fas fa-receipt'></i> Step 1/3: OCR & Deep Feature Extraction" },
+                        { p: 70, text: "<i class='fas fa-fingerprint'></i> Step 2/3: Blockchain Signature Check... (Status: MATCHED)" },
+                        { p: 90, text: "<i class='fas fa-database'></i> Step 3/3: Final Source Validation... (Status: OK)" },
+                        { p: 100, text: "Verification Complete - AUTHENTICATED." }
+                    ];
+                    let stepIndex = 0;
+                    
+                    const interval = setInterval(() => {
+                        setProgress(p => {
+                            // Advance AI Step text based on progress
+                            if (p >= steps[stepIndex]?.p) {
+                                setAiStep(steps[stepIndex]?.text || 'Finalizing...');
+                                if (stepIndex < steps.length - 1) stepIndex++;
+                            }
+
+                            const increment = (100 / delay) * 200; 
+                            let newP = p + increment;
+                            
+                            if (newP >= 100) {
+                                clearInterval(interval);
+                                setAiStep(steps[steps.length - 1].text);
+                                return 100; 
+                            }
+                            return newP;
+                        });
+                    }, 200);
+
+                    setTimeout(() => {
+                        resolve(data); // Resolve with the appropriate mock data
+                    }, delay);
+                });
+            };
+
+            const handleInitiateScan = async () => {
+                setScanResults(null);
+                setCurrentStep(0);
+                setIsLoading(true);
+                setProgress(0);
+                setAiStep('Awaiting Scan...');
+
+                // SCENE: Uploading document...
+                if (isRejected) {
+                     console.log(`[SCRIPT] Now uploading the suspicious document. OCR and deep models analyze both image and text features.`);
+                } else {
+                    console.log(`[SCRIPT] Uploading the genuine document. System runs OCR to extract text and runs forgery detectors.`);
+                }
+                
+                const result = await simulateScan();
+                setScanResults(result);
+                setIsLoading(false);
+                setProgress(100);
+
+                // SCENE: Result appears...
+                if (isRejected) {
+                    console.log(`[SCRIPT] Result: Forgery detected. Confidence ${result.verificationScore}% — see highlighted regions and ELA mismatch.`);
+                } else {
+                    console.log(`[SCRIPT] Result: Authentic. Confidence ${result.verificationScore}%. Digital stamp issued.`);
+                }
+            };
+
+            const handleStartExplanation = () => {
+                setCurrentStep(1); // Start the rejection explanation
+                console.log(`[SCRIPT] (E) Explaining how the system caught the forgery...`);
+            };
+
+            const handleNextStep = () => {
+                if (currentStep < REJECTION_STEPS.length) {
+                    const stepTitle = REJECTION_STEPS[currentStep - 1].title;
+                    // Speak the script for the current step
+                    if (stepTitle.includes("OCR mismatch")) {
+                        console.log(`[SCRIPT] OCR detects changed text — extra characters and odd spacing that don’t match original template.`);
+                    } else if (stepTitle.includes("Visual forgery localization")) {
+                        console.log(`[SCRIPT] The model’s heatmap pinpoints the edited region (signature/marksheet photo).`);
+                    } else if (stepTitle.includes("ELA")) {
+                        console.log(`[SCRIPT] ELA highlights differing compression levels — clear sign of local edits.`);
+                    } else if (stepTitle.includes("Metadata")) {
+                        console.log(`[SCRIPT] File metadata shows inconsistent timestamps and an unknown source app.`);
+                    } else if (stepTitle.includes("Font/format inconsistency")) {
+                        console.log(`[SCRIPT] Fonts and spacing don’t match the original template — another red flag.`);
+                    } else if (stepTitle.includes("SUMMARY")) {
+                        console.log(`[SCRIPT] Together, OCR anomalies, localized visual artifacts, ELA, and metadata inconsistencies prove this document was tampered with.`);
+                        // (F) Show action & reporting
+                        setTimeout(() => {
+                            console.log(`[SCRIPT] The system flags the document as REJECTED, logs evidence, and notifies the institute for manual review.`);
+                        }, 500);
+                    }
+                    setCurrentStep(prev => prev + 1);
+                }
+            };
+            
+            // --- UI Components ---
+            
+            const ScanningAnimation = () => {
+                const isGlitching = isLoading && isRejected && progress > 90;
+                const scannerLineStyle = { 
+                    animation: isGlitching ? 'scan-reject 0.5s infinite alternate' : 'scan 2.5s infinite alternate',
+                    backgroundColor: isGlitching ? 'var(--danger)' : 'var(--success)',
+                    boxShadow: isGlitching ? '0 0 15px rgba(255, 0, 0, 0.8)' : '0 0 15px rgba(40, 167, 69, 0.8)'
+                };
+
+                return (
+                    <div className={`scanner-view ${isGlitching ? 'glitch' : ''}`} 
+                         style={{ boxShadow: isRejected ? '0 0 40px rgba(200, 35, 51, 0.8)' : '0 0 40px rgba(40, 167, 69, 0.4)' }}
+                    >
+                        <i className={`fas ${isRejected ? 'fa-biohazard' : 'fa-shield-alt'}`} style={{fontSize: '2rem', color: isRejected ? 'var(--danger)' : 'var(--success)'}}></i>
+                        <p style={{fontWeight: 700}}>DocDefendes **AI DEEP SCAN** in Progress...</p>
+                        <div className="scanner-animation" style={{borderColor: isRejected ? 'var(--danger)' : 'var(--primary)'}}>
+                            <div className="scanner-line" style={scannerLineStyle}></div>
+                        </div>
+                        <p className="ai-step-text" dangerouslySetInnerHTML={{__html: aiStep}}></p>
+                        <p style={{fontSize: '0.9rem', color: isRejected ? '#ff8888' : 'var(--secondary)'}}>Verification Progress: {Math.round(progress)}%</p>
+                    </div>
+                );
+            };
+
+            const ForgeryVisualization = () => {
+                const step = REJECTION_STEPS[currentStep - 1];
+                if (!isRejected || !step || currentStep <= 0 || currentStep > REJECTION_STEPS.length) return (
+                    <div className="visualization-area">
+                        <i className="fas fa-eye-slash" style={{fontSize: '3rem', color: '#ccc'}}></i>
+                        <p style={{color: '#888'}}>Waiting for Forgery Evidence...</p>
+                    </div>
+                );
+
+                const currentViz = step.viz;
+
+                const renderVisualization = () => {
+                    switch (currentViz) {
+                        case 'ocr':
+                            return (
+                                <div>
+                                    <p style={{color: 'var(--danger)', fontWeight: 700}}>OCR Mismatch Detected!</p>
+                                    <div style={{textAlign: 'left', margin: '10px', fontSize: '0.8rem'}}>
+                                        <p style={{fontWeight: 700}}>Expected Text:</p>
+                                        <div style={{fontFamily: 'monospace', color: 'var(--success)', whiteSpace: 'pre-wrap', maxHeight: '80px', overflow: 'hidden'}}>{MOCK_DATA.EXPECTED_TEXT.substring(0, 100)}...</div>
+                                        <p style={{fontWeight: 700, marginTop: '5px'}}>Extracted Text (Anomaly):</p>
+                                        <div style={{fontFamily: 'monospace', color: 'var(--danger)', whiteSpace: 'pre-wrap', maxHeight: '80px', overflow: 'hidden'}}>{MOCK_DATA.REJECTED.extractedText.substring(0, 100)}...</div>
+                                    </div>
+                                </div>
+                            );
+                        case 'heatmap':
+                            return (
+                                <>
+                                    <p style={{color: 'var(--danger)', fontWeight: 700}}>Visual Forgery Localization</p>
+                                    <div className="heatmap-image" title="Tampering in Signature/Marks Area"></div>
+                                    <p style={{fontSize: '0.8rem', color: '#555', marginTop: '10px'}}>Model confidence of tampering: **92.1%**</p>
+                                </>
+                            );
+                        case 'ela':
+                            return (
+                                <>
+                                    <p style={{color: 'var(--danger)', fontWeight: 700}}>Error Level Analysis (ELA) Mismatch</p>
+                                    <div className="ela-image" title="Inconsistent Compression/Editing Artifacts"></div>
+                                    <p style={{fontSize: '0.8rem', color: '#555', marginTop: '10px'}}>Sharp contrast implies local editing/pasting.</p>
+                                </>
+                            );
+                        case 'metadata':
+                            return (
+                                <>
+                                    <p style={{color: 'var(--danger)', fontWeight: 700}}>Metadata Anomaly</p>
+                                    <div style={{textAlign: 'left', margin: '10px auto', width: '90%', fontSize: '0.8rem'}}>
+                                        <div className="metadata-item"><strong>Creation Date:</strong> <span>{MOCK_DATA.REJECTED.metadata.creationDate}</span></div>
+                                        <div className="metadata-item" style={{color: 'var(--danger)'}}><strong>Modification Date:</strong> <span>{MOCK_DATA.REJECTED.metadata.modDate}</span></div>
+                                        <div className="metadata-item" style={{color: 'var(--danger)'}}><strong>Source App:</strong> <span>{MOCK_DATA.REJECTED.metadata.source}</span></div>
+                                    </div>
+                                </>
+                            );
+                        case 'font':
+                            return (
+                                <>
+                                    <p style={{color: 'var(--danger)', fontWeight: 700}}>Font/Format Inconsistency</p>
+                                    <i className="fas fa-highlighter" style={{fontSize: '4rem', color: '#faa', animation: 'pulse 1s infinite alternate'}}></i>
+                                    <p style={{fontSize: '0.9rem', color: '#555', marginTop: '10px'}}>System detected two different font libraries being used.</p>
+                                </>
+                            );
+                        case 'final':
+                            return (
+                                <div style={{padding: '20px', backgroundColor: 'var(--danger)', color: 'white', borderRadius: '8px'}}>
+                                    <i className="fas fa-skull-crossbones" style={{fontSize: '3rem'}}></i>
+                                    <p style={{fontSize: '1.5rem', fontWeight: 900}}>CANCELLATION PROTOCOL INITIATED</p>
+                                    <p style={{fontSize: '0.9rem', fontWeight: 500}}>Evidence is now logged on Blockchain. Institute is notified.</p>
+                                </div>
+                            );
+      
