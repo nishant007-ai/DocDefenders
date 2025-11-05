@@ -601,27 +601,4 @@
                                         {scanResults ? 'RE-RUN SCAN' : 'START DEMO SCAN'}
                                     </>
                                 )}
-                            </button>
-
-                            {isLoading && <ScanningAnimation />}
-
-                            {scanResults && (
-                                <div className={`result-panel ${isRejected ? 'rejected' : 'approved'}`}>
-                                    <h2>
-                                        <i className={`fas ${isRejected ? 'fa-ban' : 'fa-check-circle'}`}></i>
-                                        {isRejected ? 'REJECTED' : 'APPROVED'}
-                                    </h2>
-                                    <p style={{fontSize: '1.2rem', fontWeight: 500}}>
-                                        {scanResults.forgeryLabel} | Confidence: **{scanResults.verificationScore}%**
-                                    </p>
-                                    
-                                    {!isRejected && (
-                                        <div className="digital-stamp">
-                                            <i className="fas fa-stamp"></i> Digital Stamp Issued: **SV-MH-2025-A-1024**
-                                        </div>
-                                    )}
-
-                                    {/* Action button for Rejected Scenario */}
-                                    {isRejected && currentStep === 0 && (
-                                        <button 
-              
+ 
