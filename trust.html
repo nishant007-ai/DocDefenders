@@ -389,10 +389,3 @@
                 if (currentStep < REJECTION_STEPS.length) {
                     const stepTitle = REJECTION_STEPS[currentStep - 1].title;
                     // Speak the script for the current step
-                    if (stepTitle.includes("OCR mismatch")) {
-                        console.log(`[SCRIPT] OCR detects changed text — extra characters and odd spacing that don’t match original template.`);
-                    } else if (stepTitle.includes("Visual forgery localization")) {
-                        console.log(`[SCRIPT] The model’s heatmap pinpoints the edited region (signature/marksheet photo).`);
-                    } else if (stepTitle.includes("ELA")) {
-
-                        
