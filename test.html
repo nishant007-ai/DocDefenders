@@ -715,4 +715,84 @@
                                 disabled={isLoading}
                                 aria-label="Reset Form"
                             >
+                                <i className="fas fa-undo" aria-hidden="true"></i>
+                                Reset Demo
+                            </button>
+                        </div>
+                        
+                        {/* Scanning Simulation */}
+                        {isLoading && (
+                            <div className="scanner-view">
+                                <i className="fas fa-eye" style={{fontSize: '2rem'}}></i>
+                                <p style={{fontWeight: 700}}>DocDefendes AI Engine Scanning...</p>
+                                <div className="scanner-animation">
+                                    <div className="scanner-line"></div>
+                                </div>
+                                <p className="ai-step-text"><i className="fas fa-microchip"></i> {aiStep}</p>
+                                <p style={{fontSize: '0.9rem', color: '#ffc107'}}>AI Detection Progress: {Math.round(progress)}%</p>
+                            </div>
+                        )}
+                    </div>
 
+                    {/* Final Results Display */}
+                    {scanResults.length > 0 && (
+                        <div style={{marginTop: '30px'}}>
+                            <h2>Verification Results ({scanResults.length} Documents)</h2>
+                            {scanResults.map((result, index) => (
+                                <div key={index} className={`result-section ${result.status === 'Verified' ? 'verified' : 'suspect'}`} style={{marginBottom: '20px'}}>
+                                    <p style={{fontSize: '1.2rem', display: 'flex', alignItems: 'center', justifyContent: 'space-between'}}>
+                                        <div>
+                                            <i className={`fas ${result.status === 'Verified' ? 'fa-check-circle' : 'fa-times-circle'}`} style={{marginRight: '10px'}} aria-hidden="true"></i>
+                                            <strong>{result.documentName}</strong> ({result.status})
+                                        </div>
+                                        <button 
+                                            className="btn btn-download" 
+                                            onClick={() => generateAndDownloadReport(result)}
+                                            style={{marginTop: '0'}}
+                                            aria-label={`Download Report for ${result.documentName}`}
+                                        >
+                                            <i className="fas fa-file-pdf" aria-hidden="true"></i> Download Report/Receipt
+                                        </button>
+                                    </p>
+                                    <p style={{fontSize: '1rem', fontWeight: 400}}>
+                                        {result.message}
+                                    </p>
+                                    
+                                    {/* Digital Stamp Simulation UI */}
+                                    {result.status === 'Verified' && (
+                                        <div className="digital-stamp">
+                                            <i className="fas fa-stamp stamp-icon" aria-hidden="true"></i>
+                                            <div class="stamp-text">
+                                                <p className="status" style={{color: 'var(--success)'}}>AUTHENTICATED</p>
+                                                <p style={{color: 'var(--primary)', fontWeight: 600}}>Digital Stamp Issued: **{result.verificationID}**</p>
+                                                <p style={{fontSize: '0.8rem', color: '#555'}}>Scan QR for tamper-proof log.</p>
+                                            </div>
+                                            <div id={`qrcode-${index}`} style={{width: '100px', height: '100px'}}>
+                                                <QRCodeComponent data={result.verificationID} index={index} />
+                                            </div>
+                                        </div>
+                                    )}
+
+                                    <p className="footer-message">
+                                        {result.status === 'Verified' ? 
+                                            `Backend Integration: Details sent to HOD/Admin dashboard via ${HOD_DASHBOARD_API}.` : 
+                                            `Recommendation: Flagged for manual review by ${ADMIN_EMAIL}.`
+                                        }
+                                    </p>
+                                </div>
+                            ))}
+                        </div>
+                    )}
+                    
+                    <div style={{marginTop: '40px', paddingTop: '20px', borderTop: '1px solid #ddd', textAlign: 'center', fontSize: '0.8rem', color: '#888'}}>
+                        <p>DocDefendes | Smart India Hackathon 2025 Submission</p>
+                    </div>
+                </div>
+            );
+        }
+
+        const root = ReactDOM.createRoot(document.getElementById('scan-root'));
+        root.render(<DocDefendesApp />);
+    </script>
+</body>
+</html>
