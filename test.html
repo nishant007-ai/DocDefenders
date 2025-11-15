@@ -761,4 +761,38 @@
                                     {/* Digital Stamp Simulation UI */}
                                     {result.status === 'Verified' && (
                                         <div className="digital-stamp">
-                 
+                                            <i className="fas fa-stamp stamp-icon" aria-hidden="true"></i>
+                                            <div class="stamp-text">
+                                                <p className="status" style={{color: 'var(--success)'}}>AUTHENTICATED</p>
+                                                <p style={{color: 'var(--primary)', fontWeight: 600}}>Digital Stamp Issued: **{result.verificationID}**</p>
+                                                <p style={{fontSize: '0.8rem', color: '#555'}}>Scan QR for tamper-proof log.</p>
+                                            </div>
+                                            <div id={`qrcode-${index}`} style={{width: '100px', height: '100px'}}>
+                                                <QRCodeComponent data={result.verificationID} index={index} />
+                                            </div>
+                                        </div>
+                                    )}
+
+                                    <p className="footer-message">
+                                        {result.status === 'Verified' ? 
+                                            `Backend Integration: Details sent to HOD/Admin dashboard via ${HOD_DASHBOARD_API}.` : 
+                                            `Recommendation: Flagged for manual review by ${ADMIN_EMAIL}.`
+                                        }
+                                    </p>
+                                </div>
+                            ))}
+                        </div>
+                    )}
+                    
+                    <div style={{marginTop: '40px', paddingTop: '20px', borderTop: '1px solid #ddd', textAlign: 'center', fontSize: '0.8rem', color: '#888'}}>
+                        <p>DocDefendes | Smart India Hackathon 2025 Submission</p>
+                    </div>
+                </div>
+            );
+        }
+
+        const root = ReactDOM.createRoot(document.getElementById('scan-root'));
+        root.render(<DocDefendesApp />);
+    </script>
+</body>
+</html>
