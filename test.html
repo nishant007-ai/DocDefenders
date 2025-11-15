@@ -735,30 +735,3 @@
                     </div>
 
                     {/* Final Results Display */}
-                    {scanResults.length > 0 && (
-                        <div style={{marginTop: '30px'}}>
-                            <h2>Verification Results ({scanResults.length} Documents)</h2>
-                            {scanResults.map((result, index) => (
-                                <div key={index} className={`result-section ${result.status === 'Verified' ? 'verified' : 'suspect'}`} style={{marginBottom: '20px'}}>
-                                    <p style={{fontSize: '1.2rem', display: 'flex', alignItems: 'center', justifyContent: 'space-between'}}>
-                                        <div>
-                                            <i className={`fas ${result.status === 'Verified' ? 'fa-check-circle' : 'fa-times-circle'}`} style={{marginRight: '10px'}} aria-hidden="true"></i>
-                                            <strong>{result.documentName}</strong> ({result.status})
-                                        </div>
-                                        <button 
-                                            className="btn btn-download" 
-                                            onClick={() => generateAndDownloadReport(result)}
-                                            style={{marginTop: '0'}}
-                                            aria-label={`Download Report for ${result.documentName}`}
-                                        >
-                                            <i className="fas fa-file-pdf" aria-hidden="true"></i> Download Report/Receipt
-                                        </button>
-                                    </p>
-                                    <p style={{fontSize: '1rem', fontWeight: 400}}>
-                                        {result.message}
-                                    </p>
-                                    
-                                    {/* Digital Stamp Simulation UI */}
-                                    {result.status === 'Verified' && (
-                                        <div className="digital-stamp">
-                 
